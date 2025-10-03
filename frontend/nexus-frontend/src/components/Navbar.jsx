@@ -2,7 +2,7 @@ import React from 'react';
 import { Navbar as BootstrapNavbar, Nav, Button, Container } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();

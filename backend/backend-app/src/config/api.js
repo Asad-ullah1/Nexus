@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://nexus-database-8wgh.onrender.com'; // Back to Render
+const API_BASE_URL = 'https://nexus-database-8wgh.onrender.com';
 
 const login = async (email, password) => {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -6,11 +6,6 @@ const login = async (email, password) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
-
-  if (!response.ok) {
-    throw new Error('Login failed');
-  }
-
   return response.json();
 };
 
@@ -20,11 +15,6 @@ const signup = async (email, password, name) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password, name }),
   });
-
-  if (!response.ok) {
-    throw new Error('Signup failed');
-  }
-
   return response.json();
 };
 

@@ -22,7 +22,7 @@ import { InsightsModule } from './insights/insights.module';
             type: 'postgres',
             url: databaseUrl,
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            synchronize: true, // ✅ This will create tables automatically
+            synchronize: true,
             ssl: {
               rejectUnauthorized: false,
             },
@@ -38,7 +38,7 @@ import { InsightsModule } from './insights/insights.module';
             password: configService.get('DATABASE_PASSWORD'),
             database: configService.get('DATABASE_NAME', 'nexusdb'),
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            synchronize: true, // ✅ This will create tables automatically
+            synchronize: true,
           };
         }
       },

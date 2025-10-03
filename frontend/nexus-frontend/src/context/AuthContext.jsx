@@ -1,65 +1,68 @@
 // src/context/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../lib/api';
+import { login, signup } from '../config/api';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(() => localStorage.getItem('access_token'));
   const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    if (!token) return;
-    api
-      .get('/users/profile')
-      .then((res) => setUser(res.data))
-      .catch(() => {
-        localStorage.removeItem('access_token');
-        setToken(null);
-        setUser(null);
-      });
-  }, [token]);
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsAuthenticated(true);
+      // Optionally, you can fetch the user data here using the token
+    }
+  }, []);
 
-  const login = async (email, password) => {
+  const handleLogin = async (email, password) => {
     try {
-      const res = await api.post('/auth/login', { email, password });
-      const t = res.data?.access_token || res.data?.token;
-      if (!t) throw new Error('No token returned');
-      localStorage.setItem('access_token', t);
-      setToken(t);
-      const me = await api.get('/users/profile').catch(() => null);
-      if (me?.data) setUser(me.data);
+      const data = await login(email, password);
+      if (data.access_token) {
+        localStorage.setItem('token', data.access_token);
+        setUser(data.user);
+        setIsAuthenticated(true);
+        return data;
+      }
     } catch (error) {
-      console.error('Login error:', error);
       throw error;
     }
   };
 
-  const signup = async (name, email, password) => {
+  const handleSignup = async (email, password, name) => {
     try {
-      await api.post('/auth/signup', { name, email, password });
-      return await login(email, password);
+      const data = await signup(email, password, name);
+      if (data.access_token) {
+        localStorage.setItem('token', data.access_token);
+        setUser(data.user);
+        setIsAuthenticated(true);
+        return data;
+      }
     } catch (error) {
-      console.error('Signup error:', error);
       throw error;
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('access_token');
-    setToken(null);
+    localStorage.removeItem('token');
     setUser(null);
+    setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated: !!token, login, signup, logout }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated, login: handleLogin, signup: handleSignup, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
-  return ctx;
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

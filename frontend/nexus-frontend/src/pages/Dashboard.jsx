@@ -14,7 +14,7 @@ import {
 import api from '../lib/api';
 import InsightForm from '../components/InsightForm';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext.jsx';
 import useInsights from '../hooks/useInsights'; // Import the custom hook
 
 const Dashboard = () => {

@@ -1,22 +1,21 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
-import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
-import MyInsights from './pages/MyInsights';
 import ProtectedRoute from './components/ProtectedRoute';
-import AppNavbar from './components/Navbar';
+import './App.css';
 
-export default function App() {
+function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <AppNavbar />
-        <div className="container mt-4">
+    <AuthProvider>
+      <Router>
+        <div className="App">
+          <h1>🚀 Nexus Frontend Working!</h1>
+          <p>Backend API: https://nexus-database-8wgh.onrender.com</p>
+
           <Routes>
-            <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route
@@ -28,16 +27,19 @@ export default function App() {
               }
             />
             <Route
-              path="/my-insights"
+              path="/"
               element={
-                <ProtectedRoute>
-                  <MyInsights />
-                </ProtectedRoute>
+                <div>
+                  <h2>Welcome to Nexus</h2>
+                  <a href="/login">Go to Login</a> | <a href="/signup">Sign Up</a>
+                </div>
               }
             />
           </Routes>
         </div>
-      </AuthProvider>
-    </BrowserRouter>
+      </Router>
+    </AuthProvider>
   );
 }
+
+export default App;
