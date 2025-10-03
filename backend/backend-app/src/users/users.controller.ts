@@ -4,7 +4,7 @@ import {
   Get,
   Post,
   UseGuards,
-  Request,
+  Request as NestRequest,
   Param,
   NotFoundException,
 } from '@nestjs/common';
@@ -18,7 +18,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@NestRequest() req: any) {
     return req.user;
   }
 
