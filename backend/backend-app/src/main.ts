@@ -7,17 +7,11 @@ async function bootstrap() {
   // Enhanced CORS for development and production
   app.enableCors({
     origin: [
-      'http://localhost:3000',
       'http://localhost:5173',
-      'http://localhost:5174',
-      'https://nexus-frontend.vercel.app',
-      'https://nexus-frontend.netlify.app',
-      'https://your-frontend-domain.com', // Replace with your actual frontend URL
-      process.env.FRONTEND_URL, // Environment variable for dynamic frontend URL
-    ].filter(Boolean), // Remove any undefined values
+      'https://your-frontend-domain.vercel.app', // Add your frontend URL
+      'https://nexus-database-8wgh.onrender.com',
+    ],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   const port = process.env.PORT || 3000;

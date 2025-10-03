@@ -13,23 +13,25 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: true })
-  name: string;
-
-  @Column({ unique: true, nullable: false })
+  @Column({ unique: true })
   email: string;
 
-  @Column({ select: false })
+  @Column()
   password: string;
+
+  @Column()
+  name: string;
+
+  @Column({ default: 'user' })
+  role: string;
 
   // 👇 One user can have many insights
   @OneToMany(() => Insight, (insight) => insight.author)
   insights: Insight[];
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updated_at: Date;
 }
-

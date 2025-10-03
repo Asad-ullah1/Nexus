@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private readonly usersRepository: Repository<User>,
+    private usersRepository: Repository<User>,
   ) {}
 
   // Get all users
@@ -31,8 +31,13 @@ export class UsersService {
   }
 
   // Find one user by email (without password)
-  findByEmail(email: string): Promise<User | undefined> {
-    return this.usersRepository.findOne({ where: { email } });
+  async findByEmail(email: string): Promise<User | undefined> {
+    try {
+      return await this.usersRepository.findOne({ where: { email } });
+    } catch (error) {
+      console.error('Error finding user by email:', error);
+      return undefined;
+    }
   }
 
   // Find one user by email and include password (for login)
@@ -55,8 +60,14 @@ export class UsersService {
     await this.usersRepository.update(id, updateData);
     return this.usersRepository.findOne({ where: { id } });
   }
-// Find one user by id
-async findOne(id: number): Promise<User | undefined> {
-  return this.usersRepository.findOne({ where: { id } });
-}
+
+  // Find one user by id
+  async findOne(id: number): Promise<User | undefined> {
+    try {
+      return await this.usersRepository.findOne({ where: { id } });
+    } catch (error) {
+      console.error('Error finding user by id:', error);
+      return undefined;
+    }
+  }
 }
