@@ -1,15 +1,21 @@
 {
-  "name": "backend",
+  "name": "nexus-backend",
   "version": "1.0.0",
-  "description": "",
-  "author": "",
+  "description": "Nexus Backend API",
+  "author": "Asad-ullah1",
   "private": true,
-  "license": "MIT",
+  "license": "UNLICENSED",
   "scripts": {
-    "start": "nest start",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "build": "nest build"
+    "build": "npx nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "npx nest start",
+    "start:dev": "npx nest start --watch",
+    "start:debug": "npx nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage"
   },
   "dependencies": {
     "@nestjs/config": "^4.0.2",
