@@ -1,32 +1,50 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UsersModule } from './users/users.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 import { InsightsModule } from './insights/insights.module';
 
 @Module({
   imports: [
-  ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env', 'Setup.env'] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => {
+        const databaseUrl = configService.get('DATABASE_URL');
+
+        if (databaseUrl) {
+          // Production: use DATABASE_URL
+          return {
+            type: 'postgres',
+            url: databaseUrl,
+            entities: [__dirname + '/**/*.entity{.ts,.js}'],
+            synchronize: false, // Never sync in production
+            ssl: {
+              rejectUnauthorized: false,
+            },
+          };
+        } else {
+          // Development: use individual env vars
+          return {
+            type: 'postgres',
+            host: configService.get('DB_HOST', 'localhost'),
+            port: parseInt(configService.get('DB_PORT', '5432')),
+            username: configService.get('DB_USERNAME'),
+            password: configService.get('DB_PASSWORD'),
+            database: configService.get('DB_DATABASE'),
+            entities: [__dirname + '/**/*.entity{.ts,.js}'],
+            synchronize: true,
+          };
+        }
+      },
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get<string>('DATABASE_HOST'),
-        port: parseInt(config.get<string>('DATABASE_PORT'), 10),
-        username: config.get<string>('DATABASE_USER'),
-        password: config.get<string>('DATABASE_PASSWORD'),
-        database: config.get<string>('DATABASE_NAME'),
-        autoLoadEntities: true,
-  synchronize: true, // auto creates tables (good for dev)
-  // NOTE: If in development, set "synchronize: true" to auto-create tables.
-  // For production, use migrations instead of synchronize for schema changes.
-      }),
     }),
-  UsersModule,
-  AuthModule,
-  InsightsModule,
+    AuthModule,
+    UsersModule,
+    InsightsModule,
   ],
 })
 export class AppModule {}
