@@ -15,13 +15,13 @@ export class InsightsService {
   ) {}
 
   async create(userId: number, createDto: CreateInsightDto): Promise<Insight> {
-    const author = await this.usersService.findOne(userId);
-    if (!author) {
+    const user = await this.usersService.findOne(userId);
+    if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
     const insight = this.insightRepository.create({
       ...createDto,
-      author,
+      user, // ✅ Changed from 'author' to 'user'
     });
     return this.insightRepository.save(insight);
   }
@@ -29,23 +29,18 @@ export class InsightsService {
   async findAll(search?: string, tag?: string): Promise<Insight[]> {
     const qb = this.insightRepository
       .createQueryBuilder('insight')
-      .leftJoinAndSelect('insight.author', 'author');
+      .leftJoinAndSelect('insight.user', 'user'); // ✅ Changed from 'author' to 'user'
 
-    // ✅ CHANGE: support searching in both title & summary
     if (search) {
       qb.andWhere(
-        '(insight.title ILIKE :search OR insight.summary ILIKE :search)',
+        '(insight.title ILIKE :search OR insight.content ILIKE :search)', // ✅ Changed from 'summary' to 'content'
         { search: `%${search}%` },
       );
     }
 
-    // ✅ CHANGE: filter by a single tag inside tags array
     if (tag) {
       qb.andWhere(':tag = ANY(insight.tags)', { tag });
     }
-
-    // 🔥 OPTIONAL NEXT: if you later want multiple tags (?tags=AI,philosophy)
-    // qb.andWhere('insight.tags && :tags', { tags: tagsArray });
 
     return qb.getMany();
   }
@@ -53,7 +48,7 @@ export class InsightsService {
   async findOne(id: number): Promise<Insight> {
     const insight = await this.insightRepository.findOne({
       where: { id },
-      relations: ['author'],
+      relations: ['user'], // ✅ Changed from 'author' to 'user'
     });
     if (!insight) {
       throw new NotFoundException(`Insight with ID ${id} not found`);
@@ -68,10 +63,9 @@ export class InsightsService {
   ): Promise<Insight> {
     const insight = await this.findOne(id);
 
-    // ✅ CHANGE: better error (403 instead of 404 for unauthorized update)
-    if (!insight.author || insight.author.id !== userId) {
+    if (!insight.user || insight.user.id !== userId) {
+      // ✅ Changed from 'author' to 'user'
       throw new NotFoundException('Insight not found for this user');
-      // 👉 later you can replace with ForbiddenException for cleaner auth
     }
 
     Object.assign(insight, updateDto);
@@ -85,23 +79,21 @@ export class InsightsService {
   ): Promise<Insight> {
     const insight = await this.findOne(id);
 
-    // Check if user owns the insight
-    if (!insight.author || insight.author.id !== userId) {
+    if (!insight.user || insight.user.id !== userId) {
+      // ✅ Changed from 'author' to 'user'
       throw new NotFoundException('Insight not found for this user');
     }
 
-    // Update the summary/text field
-    insight.summary = text;
+    insight.content = text; // ✅ Changed from 'summary' to 'content'
 
-    // Save and return the updated insight
     return this.insightRepository.save(insight);
   }
 
   async remove(id: number, userId: number): Promise<{ message: string }> {
     const insight = await this.findOne(id);
 
-    // ✅ same note here: consider ForbiddenException later
-    if (!insight.author || insight.author.id !== userId) {
+    if (!insight.user || insight.user.id !== userId) {
+      // ✅ Changed from 'author' to 'user'
       throw new NotFoundException('Insight not found for this user');
     }
 

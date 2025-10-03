@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Insight } from '../insights/insight.entity';
 
 @Entity('users') // ✅ match Postgres table name
 export class User {
@@ -28,4 +30,8 @@ export class User {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  // ✅ Add the missing relationship that Insight entity expects
+  @OneToMany(() => Insight, (insight) => insight.user)
+  insights: Insight[];
 }

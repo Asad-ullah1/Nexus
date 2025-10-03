@@ -9,35 +9,33 @@ import {
 } from 'typeorm';
 import { User } from '../users/user.entity';
 
-@Entity('insights') // ✅ match Postgres table name
+@Entity('insights')
 export class Insight {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column()
   title: string;
 
-  @Column({ type: 'text', nullable: false })
-  summary: string;
+  @Column('text')
+  content: string; // ✅ Make sure this matches service
 
-  @Column({ type: 'varchar', nullable: true })
-  sourceUrl?: string;
+  @Column({ nullable: true })
+  category: string;
 
-  @Column({ type: 'text', array: true, nullable: true })
+  @Column('simple-array', { nullable: true })
   tags: string[];
 
- @ManyToOne(() => User, (user) => user.insights, {
-  nullable: false,
-  onDelete: 'CASCADE',
-})
-@JoinColumn({ name: 'userId' })
-author: User;
-
-
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
-}
+  updated_at: Date;
 
+  @ManyToOne(() => User, (user) => user.insights)
+  @JoinColumn({ name: 'user_id' })
+  user: User; // ✅ Make sure this matches service
+
+  @Column()
+  user_id: number;
+}
