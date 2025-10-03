@@ -16,27 +16,29 @@ import { InsightsModule } from './insights/insights.module';
         const databaseUrl = configService.get('DATABASE_URL');
 
         if (databaseUrl) {
-          // Production: use DATABASE_URL
+          // Production: Use DATABASE_URL (Render format)
+          console.log('Using DATABASE_URL for connection');
           return {
             type: 'postgres',
             url: databaseUrl,
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            synchronize: false, // Never sync in production
+            synchronize: true, // ✅ This will create tables automatically
             ssl: {
               rejectUnauthorized: false,
             },
           };
         } else {
-          // Development: use individual env vars
+          // Development: Use individual variables
+          console.log('Using individual DB variables for connection');
           return {
             type: 'postgres',
-            host: configService.get('DB_HOST', 'localhost'),
-            port: parseInt(configService.get('DB_PORT', '5432')),
-            username: configService.get('DB_USERNAME'),
-            password: configService.get('DB_PASSWORD'),
-            database: configService.get('DB_DATABASE'),
+            host: configService.get('DATABASE_HOST', 'localhost'),
+            port: parseInt(configService.get('DATABASE_PORT', '5432')),
+            username: configService.get('DATABASE_USER', 'postgres'),
+            password: configService.get('DATABASE_PASSWORD'),
+            database: configService.get('DATABASE_NAME', 'nexusdb'),
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            synchronize: true,
+            synchronize: true, // ✅ This will create tables automatically
           };
         }
       },
