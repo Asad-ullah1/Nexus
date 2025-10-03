@@ -4,13 +4,13 @@ import {
   Get,
   Post,
   UseGuards,
-  Req,
+  Request,
   Param,
   NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // Fixed import path
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
