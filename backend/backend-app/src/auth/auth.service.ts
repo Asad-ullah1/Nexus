@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   HttpException,
   HttpStatus,
+  ConflictException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -15,15 +16,21 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signup(name: string, email: string, password: string) {
+  async signup(email: string, password: string, name: string) {
+    console.log('🔍 Signup attempt:', { email, name });
+
     // Check if user already exists
     const existingUser = await this.usersService.findByEmail(email);
+    console.log(
+      '🔍 Existing user check:',
+      existingUser ? 'User exists' : 'User not found',
+    );
+
     if (existingUser) {
-      throw new HttpException(
-        'User with this email already exists',
-        HttpStatus.CONFLICT,
-      );
+      console.log('❌ User already exists with email:', email);
+      throw new ConflictException('User with this email already exists');
     }
+
     if (!password) {
       throw new HttpException('Password is required', HttpStatus.BAD_REQUEST);
     }
