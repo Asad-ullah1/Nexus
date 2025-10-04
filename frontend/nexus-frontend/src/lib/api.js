@@ -82,3 +82,26 @@ export const signupUser = async (name, email, password) => {
 };
 
 // ✅ Export ready-to-use functions for Login.jsx and Signup.jsx
+
+// Default export for backward compatibility (axios-like instance)
+const api = {
+  get: (url) => fetch(`${API_BASE_URL}${url}`).then((res) => res.json()),
+  post: (url, data) =>
+    fetch(`${API_BASE_URL}${url}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }).then((res) => res.json()),
+  put: (url, data) =>
+    fetch(`${API_BASE_URL}${url}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }).then((res) => res.json()),
+  delete: (url) =>
+    fetch(`${API_BASE_URL}${url}`, {
+      method: 'DELETE',
+    }).then((res) => res.json()),
+};
+
+export default api;

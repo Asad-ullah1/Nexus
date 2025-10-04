@@ -1,5 +1,0 @@
-{
-  "buildCommand": "cd frontend/nexus-frontend && npm run build",
-  "outputDirectory": "frontend/nexus-frontend/dist",
-  "installCommand": "cd frontend/nexus-frontend && npm install"
-}
