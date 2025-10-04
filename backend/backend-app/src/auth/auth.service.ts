@@ -17,7 +17,11 @@ export class AuthService {
   ) {}
 
   async signup(email: string, password: string, name: string) {
-    console.log('🔍 Signup attempt:', { email, name });
+    console.log('🔍 Signup attempt with correct parameters:', {
+      email: email,
+      name: name,
+      passwordLength: password?.length,
+    });
 
     // Check if user already exists
     const existingUser = await this.usersService.findByEmail(email);
@@ -34,16 +38,32 @@ export class AuthService {
     if (!password) {
       throw new HttpException('Password is required', HttpStatus.BAD_REQUEST);
     }
-    // ✅ Always hash password before saving
+
+    // ✅ Hash password BEFORE saving
+    console.log('🔐 Hashing password...');
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // ✅ Create user with CORRECT field mapping
+    console.log('👤 Creating user with correct data structure...');
     const user = await this.usersService.create({
-      name,
-      email,
-      password: hashedPassword,
+      email: email, // ✅ email parameter → email field
+      password: hashedPassword, // ✅ hashed password → password field
+      name: name, // ✅ name parameter → name field
     });
+
+    // Generate JWT token
+    const payload = { email: user.email, sub: user.id };
+    const access_token = this.jwtService.sign(payload);
+
     // Remove password from response
     const { password: _, ...result } = user;
-    return { message: 'User created successfully', user: result };
+
+    console.log('✅ Signup successful for:', user.email);
+    return {
+      message: 'User created successfully',
+      user: result,
+      access_token,
+    };
   }
 
   async validateUser(email: string, password: string) {
@@ -58,11 +78,10 @@ export class AuthService {
     // Compare plaintext password with hashed password
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    console.log('Login debug:', {
+    console.log('🔍 Login validation:', {
       email,
-      plainPassword: password,
-      dbHashedPassword: user.password,
-      isPasswordValid,
+      userFound: !!user,
+      passwordValid: isPasswordValid,
     });
 
     if (!isPasswordValid) {
@@ -78,6 +97,7 @@ export class AuthService {
     const payload = { email: user.email, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
+      user: user,
     };
   }
 }

@@ -20,6 +20,7 @@ export class AppController {
         signup: 'POST /auth/signup',
         login: 'POST /auth/login',
         debug: 'GET /debug',
+        cleanup: 'GET /debug/cleanup',
       },
     };
   }
@@ -27,38 +28,23 @@ export class AppController {
   @Get('debug')
   async getDebugInfo(): Promise<object> {
     try {
-      console.log('🔍 Debug endpoint called - checking database...');
-
       const userCount = await this.userRepository.count();
-      console.log('👥 Total users in database:', userCount);
-
       const users = await this.userRepository.find({
         select: ['id', 'email', 'name', 'created_at'],
         order: { created_at: 'DESC' },
-        take: 10, // Get last 10 users
+        take: 10,
       });
-
-      console.log(
-        '📋 Recent users:',
-        users.map((u) => u.email),
-      );
 
       return {
         status: 'Database connected',
         totalUsers: userCount,
-        recentUsers: users.map((u) => ({
-          id: u.id,
-          email: u.email,
-          name: u.name,
-          created_at: u.created_at,
-        })),
+        users: users,
         databaseInfo: {
           timestamp: new Date().toISOString(),
           connected: true,
         },
       };
     } catch (error) {
-      console.error('❌ Database debug error:', error.message);
       return {
         status: 'Database error',
         error: error.message,
@@ -67,21 +53,35 @@ export class AppController {
     }
   }
 
-  @Get('debug/clear-test-users')
-  async clearTestUsers(): Promise<object> {
+  @Get('debug/cleanup')
+  async cleanupCorruptedData(): Promise<object> {
     try {
-      // Remove test users (be careful with this!)
-      const result = await this.userRepository.delete({
-        email: { $like: '%@example.com' } as any,
+      // Remove users where email field contains "password123" (corrupted data)
+      const corruptedUsers = await this.userRepository.find({
+        where: { email: 'password123' },
       });
 
-      return {
-        message: 'Test users cleared',
-        deletedCount: result.affected,
-      };
+      console.log('🧹 Found corrupted users:', corruptedUsers.length);
+
+      if (corruptedUsers.length > 0) {
+        const result = await this.userRepository.remove(corruptedUsers);
+        console.log('🗑️ Removed corrupted users:', result.length);
+
+        return {
+          message: 'Cleaned up corrupted user data',
+          removedUsers: result.length,
+          details: 'Removed users with email="password123"',
+        };
+      } else {
+        return {
+          message: 'No corrupted data found',
+          removedUsers: 0,
+        };
+      }
     } catch (error) {
       return {
         error: error.message,
+        message: 'Cleanup failed',
       };
     }
   }
