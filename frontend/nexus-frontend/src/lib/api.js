@@ -1,40 +1,24 @@
-// src/lib/api.js
-import axios from 'axios';
+// 🧩 Create API helper file for Nexus frontend
+// Goal: Centralize all backend API calls using VITE_API_BASE_URL from .env
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
-  headers: { 'Content-Type': 'application/json' },
-});
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// Request interceptor
-api.interceptors.request.use(
-  (config) => {
-    if (typeof window !== 'undefined' && config.headers) {
-      const token = localStorage.getItem('access_token');
-      if (token) config.headers.Authorization = `Bearer ${token}`;
-    }
-    console.log('API Request:', config.method?.toUpperCase(), config.url, config.baseURL);
-    return config;
-  },
-  (err) => Promise.reject(err)
-);
+export const loginUser = async (email, password) => {
+  const res = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  return res.json();
+};
 
-// Response interceptor for better error handling
-api.interceptors.response.use(
-  (response) => {
-    console.log('API Success:', response.status, response.config.url);
-    return response;
-  },
-  (error) => {
-    console.error('API Error:', {
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      data: error.response?.data,
-      url: error.config?.url,
-      method: error.config?.method?.toUpperCase(),
-    });
-    return Promise.reject(error);
-  }
-);
+export const signupUser = async (name, email, password) => {
+  const res = await fetch(`${API_BASE_URL}/auth/signup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, password }),
+  });
+  return res.json();
+};
 
-export default api;
+// ✅ Export ready-to-use functions for Login.jsx and Signup.jsx
