@@ -1,9 +1,13 @@
 // 🧩 Create API helper file for Nexus frontend
 // Goal: Centralize all backend API calls using VITE_API_BASE_URL from .env
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'https://nexus-database-8wgh.onrender.com';
+
+console.log('🔗 API_BASE_URL:', API_BASE_URL); // Debug log
 
 export const loginUser = async (email, password) => {
+  console.log('🔐 Login attempt to:', `${API_BASE_URL}/auth/login`);
   const res = await fetch(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -13,6 +17,7 @@ export const loginUser = async (email, password) => {
 };
 
 export const signupUser = async (name, email, password) => {
+  console.log('📝 Signup attempt to:', `${API_BASE_URL}/auth/signup`);
   const res = await fetch(`${API_BASE_URL}/auth/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
