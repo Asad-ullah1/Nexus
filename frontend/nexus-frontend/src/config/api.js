@@ -1,8 +1,7 @@
 // This file is deprecated - use ../lib/api.js instead
 // Keeping for backward compatibility
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'https://nexus-database-8wgh.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const login = async (email, password) => {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {

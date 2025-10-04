@@ -2,8 +2,7 @@
 // Goal: Centralize all backend API calls using VITE_API_BASE_URL from .env
 // Force rebuild: 2025-10-04-v3
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'https://nexus-database-8wgh.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 console.log('🔗 API_BASE_URL:', API_BASE_URL); // Debug log
 console.log('🔗 All env vars:', import.meta.env); // Debug all env vars

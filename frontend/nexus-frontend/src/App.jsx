@@ -1,4 +1,5 @@
 import React from 'react';
+import HealthCheck from './HealthCheck.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
 import Login from './pages/Login';
@@ -13,7 +14,8 @@ function App() {
       <Router>
         <div className="App">
           <h1>🚀 Nexus Frontend Working!</h1>
-          <p>Backend API: https://nexus-database-8wgh.onrender.com</p>
+          <p>Backend API: {import.meta.env.VITE_API_BASE_URL || 'Not set'}</p>
+          <HealthCheck />
 
           <Routes>
             <Route path="/login" element={<Login />} />
