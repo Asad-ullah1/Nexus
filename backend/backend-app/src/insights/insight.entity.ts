@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { User } from '../users/user.entity';
 
-@Entity('insights')
+@Entity('insight')
 export class Insight {
   @PrimaryGeneratedColumn()
   id: number;
@@ -17,14 +17,20 @@ export class Insight {
   @Column()
   title: string;
 
-  @Column('text')
-  content: string; // ✅ Make sure this matches service
+  @Column('text', { nullable: true })
+  content?: string;
+
+  @Column({ nullable: true })
+  summary?: string;
 
   @Column({ nullable: true })
   category: string;
 
   @Column('simple-array', { nullable: true })
   tags: string[];
+
+  @Column({ nullable: true })
+  sourceUrl?: string;
 
   @CreateDateColumn()
   created_at: Date;
@@ -33,9 +39,9 @@ export class Insight {
   updated_at: Date;
 
   @ManyToOne(() => User, (user) => user.insights)
-  @JoinColumn({ name: 'user_id' })
-  user: User; // ✅ Make sure this matches service
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
   @Column()
-  user_id: number;
+  userId: number;
 }

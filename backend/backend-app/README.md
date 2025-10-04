@@ -21,54 +21,84 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## Nexus Backend - Local Development
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+This is the NestJS backend for the Nexus insights management platform, configured for localhost development.
 
-## Project setup
+### Prerequisites
+- Node.js (v16 or higher)
+- PostgreSQL database
+- Database named `nexusdb` created
+
+### Environment Setup
+1. Copy the database credentials to your environment or update `Setup.env`:
+   ```env
+   DATABASE_HOST=localhost
+   DATABASE_PORT=5432
+   DATABASE_USER=postgres
+   DATABASE_PASSWORD=your_password_here
+   DATABASE_NAME=nexusdb
+   ```
+
+2. **IMPORTANT: Fix Database Issues First**
+   
+   If you're getting "column userId contains null values" errors, run one of these:
+   
+   **Option A: Use the automated fix script (Windows)**
+   ```cmd
+   fix-db.bat
+   ```
+   
+   **Option B: Use PowerShell script**
+   ```powershell
+   .\fix-db.ps1
+   ```
+   
+   **Option C: Manual fix**
+   ```bash
+   psql -U postgres -d nexusdb -f fix-database-complete.sql
+   ```
+
+3. **For Fresh Setup (if you want to start clean)**
+   ```bash
+   psql -U postgres -d nexusdb -f setup-database.sql
+   ```
+
+### Installation & Development
 
 ```bash
-$ npm install
+# Install dependencies
+npm install
+
+# Start in development mode (with hot reload)
+npm run start:dev
+
+# Start in production mode
+npm run start:prod
+
+# Start normally
+npm run start
 ```
 
-## Compile and run the project
+The backend will run on `http://localhost:3000`
 
-```bash
-# development
-$ npm run start
+### API Endpoints
+- **Auth**: `/auth/login`, `/auth/signup`
+- **Users**: `/users/*`
+- **Insights**: `/insights/*`
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
+### Testing
 
 ```bash
 # unit tests
-$ npm run test
+npm run test
 
 # e2e tests
-$ npm run test:e2e
+npm run test:e2e
 
 # test coverage
-$ npm run test:cov
+npm run test:cov
 ```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
 
 ## Resources
 

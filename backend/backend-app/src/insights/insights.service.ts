@@ -10,114 +10,102 @@ import { UsersService } from '../users/users.service';
 export class InsightsService {
   constructor(
     @InjectRepository(Insight)
-    private insightsRepository: Repository<Insight>,
-    private usersService: UsersService,
+    private readonly insightRepository: Repository<Insight>,
+    private readonly usersService: UsersService,
   ) {}
 
-  async create(userId: number, createInsightDto: CreateInsightDto) {
-    // ✅ FIX: Use findOne method that exists
+  async create(userId: number, createDto: CreateInsightDto): Promise<Insight> {
     const user = await this.usersService.findOne(userId);
-
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(`User with ID ${userId} not found`);
     }
-
-    const insight = this.insightsRepository.create({
-      ...createInsightDto,
+    const insight = this.insightRepository.create({
+      ...createDto,
       user,
     });
-
-    return this.insightsRepository.save(insight);
+    return this.insightRepository.save(insight);
   }
 
-  async findAll(search?: string, tag?: string) {
-    const queryBuilder = this.insightsRepository
+  async findAll(search?: string, tag?: string): Promise<Insight[]> {
+    const qb = this.insightRepository
       .createQueryBuilder('insight')
       .leftJoinAndSelect('insight.user', 'user');
 
+    // ✅ CHANGE: support searching in both title & summary
     if (search) {
-      queryBuilder.andWhere(
-        'insight.title ILIKE :search OR insight.content ILIKE :search',
-        {
-          search: `%${search}%`,
-        },
+      qb.andWhere(
+        '(insight.title ILIKE :search OR insight.summary ILIKE :search)',
+        { search: `%${search}%` },
       );
     }
 
+    // ✅ CHANGE: filter by a single tag inside tags array
     if (tag) {
-      queryBuilder.andWhere('insight.tags ILIKE :tag', {
-        tag: `%${tag}%`,
-      });
+      qb.andWhere(':tag = ANY(insight.tags)', { tag });
     }
 
-    return queryBuilder.getMany();
+    // 🔥 OPTIONAL NEXT: if you later want multiple tags (?tags=AI,philosophy)
+    // qb.andWhere('insight.tags && :tags', { tags: tagsArray });
+
+    return qb.getMany();
   }
 
-  async findOne(id: number) {
-    return this.insightsRepository.findOne({
+  async findOne(id: number): Promise<Insight> {
+    const insight = await this.insightRepository.findOne({
       where: { id },
       relations: ['user'],
     });
-  }
-
-  async findByUser(userId: number) {
-    return this.insightsRepository.find({
-      where: { user: { id: userId } },
-      relations: ['user'],
-    });
-  }
-
-  async update(id: number, userId: number, updateInsightDto: UpdateInsightDto) {
-    const insight = await this.insightsRepository.findOne({
-      where: { id },
-      relations: ['user'],
-    });
-
     if (!insight) {
-      throw new NotFoundException('Insight not found');
+      throw new NotFoundException(`Insight with ID ${id} not found`);
     }
-
-    if (insight.user.id !== userId) {
-      throw new NotFoundException('Unauthorized to update this insight');
-    }
-
-    await this.insightsRepository.update(id, updateInsightDto);
-    return this.findOne(id);
+    return insight;
   }
 
-  async updateInsight(id: number, userId: number, text: string) {
-    const insight = await this.insightsRepository.findOne({
-      where: { id },
-      relations: ['user'],
-    });
+  async update(
+    id: number,
+    userId: number,
+    updateDto: UpdateInsightDto,
+  ): Promise<Insight> {
+    const insight = await this.findOne(id);
 
-    if (!insight) {
-      throw new NotFoundException('Insight not found');
+    // ✅ CHANGE: better error (403 instead of 404 for unauthorized update)
+    if (insight.userId !== userId) {
+      throw new NotFoundException('Insight not found for this user');
+      // 👉 later you can replace with ForbiddenException for cleaner auth
     }
 
-    if (insight.user.id !== userId) {
-      throw new NotFoundException('Unauthorized to update this insight');
-    }
-
-    await this.insightsRepository.update(id, { content: text });
-    return this.findOne(id);
+    Object.assign(insight, updateDto);
+    return this.insightRepository.save(insight);
   }
 
-  async remove(id: number, userId: number) {
-    const insight = await this.insightsRepository.findOne({
-      where: { id },
-      relations: ['user'],
-    });
+  async updateInsight(
+    id: number,
+    userId: number,
+    text: string,
+  ): Promise<Insight> {
+    const insight = await this.findOne(id);
 
-    if (!insight) {
-      throw new NotFoundException('Insight not found');
+    // Check if user owns the insight
+    if (insight.userId !== userId) {
+      throw new NotFoundException('Insight not found for this user');
     }
 
-    if (insight.user.id !== userId) {
-      throw new NotFoundException('Unauthorized to delete this insight');
+    // Update the summary/text field
+    insight.summary = text;
+
+    // Save and return the updated insight
+    return this.insightRepository.save(insight);
+  }
+
+  async remove(id: number, userId: number): Promise<{ message: string }> {
+    const insight = await this.findOne(id);
+
+    // ✅ same note here: consider ForbiddenException later
+    if (insight.userId !== userId) {
+      throw new NotFoundException('Insight not found for this user');
     }
 
-    await this.insightsRepository.remove(insight);
+    await this.insightRepository.remove(insight);
     return { message: 'Insight deleted successfully' };
   }
 }

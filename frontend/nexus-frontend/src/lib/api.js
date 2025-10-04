@@ -1,106 +1,40 @@
-// 🧩 Create API helper file for Nexus frontend
-// Goal: Centralize all backend API calls using VITE_API_BASE_URL from .env
-// Force rebuild: 2025-10-04-v3
+// src/lib/api.js
+import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
+  headers: { 'Content-Type': 'application/json' },
+});
 
-console.log('🔗 API_BASE_URL:', API_BASE_URL); // Debug log
-console.log('🔗 All env vars:', import.meta.env); // Debug all env vars
-
-// Health check function
-export const checkBackendHealth = async () => {
-  try {
-    console.log('🏥 Checking backend health...');
-    const res = await fetch(`${API_BASE_URL}`);
-    console.log('🏥 Backend status:', res.status);
-    return res.status === 200;
-  } catch (error) {
-    console.error('❌ Backend health check failed:', error);
-    return false;
-  }
-};
-
-// Test function to verify URL
-export const testAPIURL = () => {
-  console.log('🧪 Testing API URL configuration:');
-  console.log('🧪 VITE_API_BASE_URL from env:', import.meta.env.VITE_API_BASE_URL);
-  console.log('🧪 Final API_BASE_URL:', API_BASE_URL);
-  console.log('🧪 Test signup URL would be:', `${API_BASE_URL}/auth/signup`);
-  return API_BASE_URL;
-};
-
-export const loginUser = async (email, password) => {
-  console.log('🔐 Login attempt to:', `${API_BASE_URL}/auth/login`);
-
-  try {
-    const res = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-
-    console.log('📡 Response status:', res.status);
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
+// Request interceptor
+api.interceptors.request.use(
+  (config) => {
+    if (typeof window !== 'undefined' && config.headers) {
+      const token = localStorage.getItem('access_token');
+      if (token) config.headers.Authorization = `Bearer ${token}`;
     }
+    console.log('API Request:', config.method?.toUpperCase(), config.url, config.baseURL);
+    return config;
+  },
+  (err) => Promise.reject(err)
+);
 
-    const data = await res.json();
-    console.log('✅ Login successful:', data);
-    return data;
-  } catch (error) {
-    console.error('❌ Login error:', error);
-    throw error;
-  }
-};
-
-export const signupUser = async (name, email, password) => {
-  console.log('📝 Signup attempt to:', `${API_BASE_URL}/auth/signup`);
-
-  try {
-    const res = await fetch(`${API_BASE_URL}/auth/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password }),
+// Response interceptor for better error handling
+api.interceptors.response.use(
+  (response) => {
+    console.log('API Success:', response.status, response.config.url);
+    return response;
+  },
+  (error) => {
+    console.error('API Error:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      url: error.config?.url,
+      method: error.config?.method?.toUpperCase(),
     });
-
-    console.log('📡 Response status:', res.status);
-    console.log('📡 Response headers:', res.headers);
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
-
-    const data = await res.json();
-    console.log('✅ Signup successful:', data);
-    return data;
-  } catch (error) {
-    console.error('❌ Signup error:', error);
-    throw error;
+    return Promise.reject(error);
   }
-};
-
-// ✅ Export ready-to-use functions for Login.jsx and Signup.jsx
-
-// Default export for backward compatibility (axios-like instance)
-const api = {
-  get: (url) => fetch(`${API_BASE_URL}${url}`).then((res) => res.json()),
-  post: (url, data) =>
-    fetch(`${API_BASE_URL}${url}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    }).then((res) => res.json()),
-  put: (url, data) =>
-    fetch(`${API_BASE_URL}${url}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    }).then((res) => res.json()),
-  delete: (url) =>
-    fetch(`${API_BASE_URL}${url}`, {
-      method: 'DELETE',
-    }).then((res) => res.json()),
-};
+);
 
 export default api;

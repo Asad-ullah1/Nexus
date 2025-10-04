@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Container,
   Row,
@@ -33,18 +33,15 @@ const MyInsights = () => {
   const { user } = useAuth();
   const { updateInsight, loading: updateLoading, error: updateError } = useInsights(); // Use the custom hook
 
-  // Fetch only user's insights
-  useEffect(() => {
-    fetchMyInsights();
-  }, []);
-
-  const fetchMyInsights = async () => {
+  const fetchMyInsights = useCallback(async () => {
+    if (!user) return; // Don't fetch if user is not available yet
+    
     try {
       setLoading(true);
       const response = await api.get('/insights');
       // Filter to only show current user's insights
       const myInsights = response.data.filter(
-        (insight) => user && insight.author && insight.author.id === user.id
+        (insight) => insight.author && insight.author.id === user.id
       );
       setInsights(myInsights);
       setError('');
@@ -54,7 +51,12 @@ const MyInsights = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  // Fetch only user's insights
+  useEffect(() => {
+    fetchMyInsights();
+  }, [fetchMyInsights]); // Re-fetch when user changes
 
   const handleCreate = () => {
     setEditingInsight(null);

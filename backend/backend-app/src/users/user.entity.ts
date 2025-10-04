@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Insight } from '../insights/insight.entity';
 
-@Entity('users') // ✅ match Postgres table name
+@Entity('user') // ✅ match Postgres table name
 export class User {
   @PrimaryGeneratedColumn()
   id: number;

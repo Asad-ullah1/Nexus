@@ -12,51 +12,19 @@ import { User } from './users/user.entity';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => {
-        const databaseUrl = configService.get('DATABASE_URL');
-
-        console.log('🔍 DATABASE CONNECTION DEBUG:');
-        console.log('DATABASE_URL exists:', !!databaseUrl);
-        if (databaseUrl) {
-          // Log only the host part for security
-          const urlParts = databaseUrl.match(
-            /postgresql:\/\/([^:]+):([^@]+)@([^\/]+)\/(.+)/,
-          );
-          if (urlParts) {
-            console.log('Database host:', urlParts[3]);
-            console.log('Database name:', urlParts[4]);
-          }
-        }
-
-        if (databaseUrl) {
-          console.log('✅ Using DATABASE_URL for connection');
-          return {
-            type: 'postgres',
-            url: databaseUrl,
-            entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            synchronize: true,
-            ssl: {
-              rejectUnauthorized: false,
-            },
-            logging: ['error', 'warn'], // Add database query logging
-          };
-        } else {
-          console.log('⚠️ Using individual DB variables for connection');
-          return {
-            type: 'postgres',
-            host: configService.get('DATABASE_HOST', 'localhost'),
-            port: parseInt(configService.get('DATABASE_PORT', '5432')),
-            username: configService.get('DATABASE_USER', 'postgres'),
-            password: configService.get('DATABASE_PASSWORD'),
-            database: configService.get('DATABASE_NAME', 'nexusdb'),
-            entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            synchronize: true,
-          };
-        }
-      },
-      inject: [ConfigService],
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DATABASE_HOST || 'localhost',
+      port: parseInt(process.env.DATABASE_PORT, 10) || 5432,
+      username: process.env.DATABASE_USER || 'postgres',
+      password: process.env.DATABASE_PASSWORD || 'admin123',
+      database: process.env.DATABASE_NAME || 'nexusdb',
+      autoLoadEntities: true,
+      synchronize: false, // Disable auto-sync to prevent schema conflicts
+      logging: ['error', 'warn'], // Enable logging to see issues
+      ssl: false,
+      retryAttempts: 3,
+      retryDelay: 3000,
     }),
     TypeOrmModule.forFeature([User]),
     AuthModule,
@@ -65,4 +33,12 @@ import { User } from './users/user.entity';
   ],
   controllers: [AppController],
 })
-export class AppModule {}
+export class AppModule {
+  constructor() {
+    console.log('🔍 LOCAL DATABASE CONNECTION DEBUG:');
+    console.log('Host:', process.env.DATABASE_HOST);
+    console.log('Port:', process.env.DATABASE_PORT);
+    console.log('User:', process.env.DATABASE_USER);
+    console.log('Database:', process.env.DATABASE_NAME);
+  }
+}

@@ -1,6 +1,6 @@
 // src/context/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { loginUser, signupUser } from '../lib/api';
+import { login, signup } from '../config/api';
 
 const AuthContext = createContext();
 
@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (token) {
       setIsAuthenticated(true);
       // Optionally, you can fetch the user data here using the token
@@ -18,10 +18,9 @@ export const AuthProvider = ({ children }) => {
 
   const handleLogin = async (email, password) => {
     try {
-      const data = await loginUser(email, password);
-      console.log('Login response:', data);
+      const data = await login(email, password);
       if (data.access_token) {
-        localStorage.setItem('token', data.access_token);
+        localStorage.setItem('access_token', data.access_token);
         setUser(data.user);
         setIsAuthenticated(true);
         return data;
@@ -31,12 +30,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const handleSignup = async (name, email, password) => {
+  const handleSignup = async (email, password, name) => {
     try {
-      const data = await signupUser(name, email, password);
-      console.log('Signup response:', data);
+      const data = await signup(email, password, name);
       if (data.access_token) {
-        localStorage.setItem('token', data.access_token);
+        localStorage.setItem('access_token', data.access_token);
         setUser(data.user);
         setIsAuthenticated(true);
         return data;
@@ -47,7 +45,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('access_token');
     setUser(null);
     setIsAuthenticated(false);
   };

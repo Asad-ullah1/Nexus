@@ -23,7 +23,7 @@ const Signup = () => {
     setApiError('');
 
     try {
-      await signup(data.name, data.email, data.password);
+      await signup(data.email, data.password, data.name);
       navigate('/dashboard');
     } catch (error) {
       console.error('Signup error details:', error);

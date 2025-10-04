@@ -85,22 +85,4 @@ export class AppController {
       };
     }
   }
-
-  @Get('debug/routes')
-  getAvailableRoutes(): object {
-    return {
-      message: 'Available API Routes',
-      routes: [
-        'GET / - Health check',
-        'GET /debug - Database info',
-        'GET /debug/cleanup - Clean corrupted data',
-        'GET /debug/routes - This endpoint',
-        'POST /auth/signup - User registration',
-        'POST /auth/login - User authentication',
-        'GET /users - List users (protected)',
-        'POST /users - Create user (protected)',
-      ],
-      timestamp: new Date().toISOString(),
-    };
-  }
 }
