@@ -31,18 +31,22 @@ export class InsightsService {
   }
 
   async findAll(search?: string, tag?: string) {
-    const queryBuilder = this.insightsRepository.createQueryBuilder('insight')
+    const queryBuilder = this.insightsRepository
+      .createQueryBuilder('insight')
       .leftJoinAndSelect('insight.user', 'user');
 
     if (search) {
-      queryBuilder.andWhere('insight.title ILIKE :search OR insight.content ILIKE :search', {
-        search: `%${search}%`
-      });
+      queryBuilder.andWhere(
+        'insight.title ILIKE :search OR insight.content ILIKE :search',
+        {
+          search: `%${search}%`,
+        },
+      );
     }
 
     if (tag) {
       queryBuilder.andWhere('insight.tags ILIKE :tag', {
-        tag: `%${tag}%`
+        tag: `%${tag}%`,
       });
     }
 
