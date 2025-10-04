@@ -2,12 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
-
-export interface CreateUserDto {
-  email: string;
-  password: string;
-  name: string;
-}
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -43,17 +39,30 @@ export class UsersService {
     return savedUser;
   }
 
-  // ✅ FIX: Add missing findOne method
-  async findOne(id: number): Promise<User | null> {
-    return this.usersRepository.findOne({ where: { id } });
+  // ✅ Flexible findOne method - accepts userId (number) OR email (string)
+  async findOne(identifier: number | string): Promise<User | null> {
+    if (typeof identifier === 'number') {
+      // Search by ID
+      return this.usersRepository.findOne({
+        where: { id: identifier },
+      });
+    } else if (typeof identifier === 'string') {
+      // Search by email
+      return this.usersRepository.findOne({
+        where: { email: identifier },
+      });
+    }
+
+    return null;
   }
 
-  // Find one user by email (without password)
+  // Keep specific methods for auth service compatibility
   async findByEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findOne({ where: { email } });
+    return this.usersRepository.findOne({
+      where: { email },
+    });
   }
 
-  // Find one user by email and include password (for login)
   async findByEmailWithPassword(email: string): Promise<User | null> {
     return this.usersRepository.findOne({
       where: { email },
@@ -61,20 +70,18 @@ export class UsersService {
     });
   }
 
-  // Get all users
   async findAll(): Promise<User[]> {
     return this.usersRepository.find({
       select: ['id', 'email', 'name', 'role', 'created_at'],
     });
   }
 
-  // ✅ FIX: Add update method for users controller
-  async update(id: number, userData: Partial<User>): Promise<User> {
-    await this.usersRepository.update(id, userData);
+  // ✅ Updated to use UpdateUserDto
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    await this.usersRepository.update(id, updateUserDto);
     return this.findOne(id);
   }
 
-  // ✅ FIX: Add remove method
   async remove(id: number): Promise<void> {
     await this.usersRepository.delete(id);
   }
