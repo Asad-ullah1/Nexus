@@ -43,6 +43,11 @@ export class UsersService {
     return savedUser;
   }
 
+  // ✅ FIX: Add missing findOne method
+  async findOne(id: number): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { id } });
+  }
+
   // Find one user by email (without password)
   async findByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { email } });
@@ -61,5 +66,16 @@ export class UsersService {
     return this.usersRepository.find({
       select: ['id', 'email', 'name', 'role', 'created_at'],
     });
+  }
+
+  // ✅ FIX: Add update method for users controller
+  async update(id: number, userData: Partial<User>): Promise<User> {
+    await this.usersRepository.update(id, userData);
+    return this.findOne(id);
+  }
+
+  // ✅ FIX: Add remove method
+  async remove(id: number): Promise<void> {
+    await this.usersRepository.delete(id);
   }
 }

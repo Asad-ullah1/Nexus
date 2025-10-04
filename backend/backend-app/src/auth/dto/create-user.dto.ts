@@ -14,14 +14,14 @@ export class SignupDto {
 }
 
 export class CreateUserDto {
-  @IsEmail()
   email: string;
-
-  @IsString()
-  @MinLength(6)
   password: string;
+  name: string;
+}
 
-  @IsOptional()
-  @IsString()
+export class UpdateUserDto {
+  email?: string;
+  password?: string;
   name?: string;
+  role?: string;
 }
