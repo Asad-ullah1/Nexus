@@ -21,20 +21,20 @@ export const checkBackendHealth = async () => {
 
 export const loginUser = async (email, password) => {
   console.log('🔐 Login attempt to:', `${API_BASE_URL}/auth/login`);
-  
+
   try {
     const res = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
-    
+
     console.log('📡 Response status:', res.status);
-    
+
     if (!res.ok) {
       throw new Error(`HTTP error! status: ${res.status}`);
     }
-    
+
     const data = await res.json();
     console.log('✅ Login successful:', data);
     return data;
@@ -46,21 +46,21 @@ export const loginUser = async (email, password) => {
 
 export const signupUser = async (name, email, password) => {
   console.log('📝 Signup attempt to:', `${API_BASE_URL}/auth/signup`);
-  
+
   try {
     const res = await fetch(`${API_BASE_URL}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password }),
     });
-    
+
     console.log('📡 Response status:', res.status);
     console.log('📡 Response headers:', res.headers);
-    
+
     if (!res.ok) {
       throw new Error(`HTTP error! status: ${res.status}`);
     }
-    
+
     const data = await res.json();
     console.log('✅ Signup successful:', data);
     return data;
