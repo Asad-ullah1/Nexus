@@ -10,8 +10,11 @@ async function bootstrap() {
       'http://localhost:5173',
       'http://localhost:3000',
       'https://nexus-frontend-xi-swart.vercel.app',
+      'https://nexus-frontend-l6rs865sa-asadullahs-projects-eab8119b.vercel.app', // Add the other Vercel domain from your logs
     ],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   app.useGlobalPipes(new ValidationPipe({
