@@ -2,7 +2,6 @@ import {
   IsString,
   IsNotEmpty,
   IsOptional,
-  IsUrl,
   IsArray,
 } from 'class-validator';
 
@@ -13,11 +12,11 @@ export class CreateInsightDto {
 
   @IsString()
   @IsNotEmpty()
-  summary: string;
+  content: string;
 
   @IsOptional()
-  @IsUrl()
-  sourceUrl?: string;
+  @IsString()
+  category?: string;
 
   @IsOptional()
   @IsArray()

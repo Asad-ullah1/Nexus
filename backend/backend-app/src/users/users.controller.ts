@@ -10,7 +10,8 @@ import {
   Param,
   NotFoundException,
 } from '@nestjs/common';
-import { UsersService, CreateUserDto } from './users.service';
+import { UsersService } from './users.service';
+import { CreateUserDto, UpdateUserDto } from './dto';
 import { User } from './user.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -42,7 +43,7 @@ export class UsersController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: Partial<User>) {
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
