@@ -1,10 +1,12 @@
 // 🧩 Create API helper file for Nexus frontend
 // Goal: Centralize all backend API calls using VITE_API_BASE_URL from .env
+// Force rebuild: 2025-10-04-v3
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'https://nexus-database-8wgh.onrender.com';
 
 console.log('🔗 API_BASE_URL:', API_BASE_URL); // Debug log
+console.log('🔗 All env vars:', import.meta.env); // Debug all env vars
 
 // Health check function
 export const checkBackendHealth = async () => {
@@ -17,6 +19,15 @@ export const checkBackendHealth = async () => {
     console.error('❌ Backend health check failed:', error);
     return false;
   }
+};
+
+// Test function to verify URL
+export const testAPIURL = () => {
+  console.log('🧪 Testing API URL configuration:');
+  console.log('🧪 VITE_API_BASE_URL from env:', import.meta.env.VITE_API_BASE_URL);
+  console.log('🧪 Final API_BASE_URL:', API_BASE_URL);
+  console.log('🧪 Test signup URL would be:', `${API_BASE_URL}/auth/signup`);
+  return API_BASE_URL;
 };
 
 export const loginUser = async (email, password) => {
