@@ -17,7 +17,7 @@ const Navbar = () => {
     <BootstrapNavbar bg="dark" variant="dark" expand="lg">
       <Container>
         <LinkContainer to="/">
-          <BootstrapNavbar.Brand>IdeaSpark</BootstrapNavbar.Brand>
+          <BootstrapNavbar.Brand>Nexus Ideas</BootstrapNavbar.Brand>
         </LinkContainer>
 
         <BootstrapNavbar.Toggle aria-controls="basic-navbar-nav" />

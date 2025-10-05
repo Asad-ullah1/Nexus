@@ -12,19 +12,16 @@ import { User } from './users/user.entity';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    // ✅ Database connection setup
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DATABASE_HOST || 'localhost',
-      port: parseInt(process.env.DATABASE_PORT, 10) || 5432,
-      username: process.env.DATABASE_USER || 'postgres',
-      password: process.env.DATABASE_PASSWORD || 'admin123',
-      database: process.env.DATABASE_NAME || 'nexusdb',
-      autoLoadEntities: true,
-      synchronize: false, // Disable auto-sync to prevent schema conflicts
-      logging: ['error', 'warn'], // Enable logging to see issues
-      ssl: false,
-      retryAttempts: 3,
-      retryDelay: 3000,
+      url: process.env.DATABASE_URL, // Reads from .env
+      autoLoadEntities: true, // Auto-detects all entities in project
+      synchronize: true, // Auto-creates tables during development (disable in production)
+      logging: ['error', 'warn'], // Logs errors/warnings
+      ssl: false, // Disable SSL for local setup
+      retryAttempts: 3, // Retries if DB not ready
+      retryDelay: 3000, // Wait time between retries
     }),
     TypeOrmModule.forFeature([User]),
     AuthModule,
@@ -36,9 +33,6 @@ import { User } from './users/user.entity';
 export class AppModule {
   constructor() {
     console.log('🔍 LOCAL DATABASE CONNECTION DEBUG:');
-    console.log('Host:', process.env.DATABASE_HOST);
-    console.log('Port:', process.env.DATABASE_PORT);
-    console.log('User:', process.env.DATABASE_USER);
-    console.log('Database:', process.env.DATABASE_NAME);
+    console.log('DATABASE_URL:', process.env.DATABASE_URL);
   }
 }

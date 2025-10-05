@@ -4,18 +4,20 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // ✅ Updated CORS config
+  // ✅ Safe and flexible CORS configuration
   app.enableCors({
     origin: [
-      'http://localhost:5174', // local Vite dev frontend
-      // (replace with your actual frontend domain when deployed)
-      'https://nexus-database-8wgh.onrender.com', // allow self requests (Render internal health checks)
+      'http://localhost:5173', // ✅ your Vite frontend (default)
+      'http://localhost:5174', // if Vite picks 5174 instead of 5173
+      'https://nexus-frontend.vercel.app', // 🔹 (use your actual Vercel domain after deploy)
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
 
-  await app.listen(process.env.PORT || 3000);
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
+  console.log(`🚀 Backend running on http://localhost:${port}`);
 }
 bootstrap();
