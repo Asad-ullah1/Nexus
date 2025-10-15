@@ -17,7 +17,7 @@ import { User } from './users/user.entity';
       type: 'postgres',
       url: process.env.DATABASE_URL, // Reads from .env
       autoLoadEntities: true, // Auto-detects all entities in project
-      synchronize: true, // Auto-creates tables during development (disable in production)
+      synchronize: process.env.NODE_ENV !== 'production', // Auto-sync only in development
       logging: ['error', 'warn'], // Logs errors/warnings
       ssl: false, // Disable SSL for local setup
       retryAttempts: 3, // Retries if DB not ready
