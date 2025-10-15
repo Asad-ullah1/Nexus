@@ -19,7 +19,7 @@ import { User } from './users/user.entity';
       autoLoadEntities: true, // Auto-detects all entities in project
       synchronize: process.env.NODE_ENV !== 'production', // Auto-sync only in development
       logging: ['error', 'warn'], // Logs errors/warnings
-      ssl: false, // Disable SSL for local setup
+      ssl: { rejectUnauthorized: false }, // Enable SSL for production (Render PostgreSQL)
       retryAttempts: 3, // Retries if DB not ready
       retryDelay: 3000, // Wait time between retries
     }),
