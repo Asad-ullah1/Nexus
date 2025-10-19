@@ -5,7 +5,7 @@ import axios from 'axios';
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   (import.meta.env.MODE === 'production'
-    ? 'https://nexus-database-8wgh.onrender.com' // your deployed backend
+    ? 'https://nexus-backend-0dqd.onrender.com' // ✅ your new deployed backend on Render
     : 'http://localhost:3000'); // local dev backend
 
 // ✅ Create Axios instance
