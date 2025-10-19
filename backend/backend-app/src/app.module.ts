@@ -14,22 +14,23 @@ import { User } from './users/user.entity';
       isGlobal: true,
     }),
 
-    // ✅ Database connection
+    // ✅ Database connection setup with environment safety
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
         type: 'postgres',
         url: process.env.DATABASE_URL,
         autoLoadEntities: true,
-        synchronize: true, // ✅ TEMP: auto-create tables for first deploy
+        // 🔹 Synchronize only in development; disable in production
+        synchronize: process.env.NODE_ENV !== 'production',
         logging: ['error', 'warn'],
         ssl:
           process.env.NODE_ENV === 'production'
-            ? { rejectUnauthorized: false }
+            ? { rejectUnauthorized: false } // Enable SSL on Render Postgres
             : false, // Disable SSL locally
       }),
     }),
 
-    // ✅ Load entities and modules
+    // ✅ Load entities for injection
     TypeOrmModule.forFeature([User]),
     AuthModule,
     UsersModule,
@@ -41,5 +42,9 @@ export class AppModule {
   constructor() {
     console.log('🟢 AppModule initialized');
     console.log('DATABASE_URL:', process.env.DATABASE_URL);
+    console.log(
+      '🔹 Synchronize enabled:',
+      process.env.NODE_ENV !== 'production',
+    );
   }
 }
