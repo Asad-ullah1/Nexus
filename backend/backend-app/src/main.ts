@@ -7,9 +7,9 @@ async function bootstrap() {
   // ✅ Safe and flexible CORS configuration
   app.enableCors({
     origin: [
-      'http://localhost:5173', // ✅ your Vite frontend (default)
-      'http://localhost:5174', // if Vite picks 5174 instead of 5173
-      'https://nexus-frontend.vercel.app', // 🔹 (use your actual Vercel domain after deploy)
+      'http://localhost:5173', // for local Vite dev
+      'http://localhost:5174', // optional local
+      'https://nexus-m766.vercel.app', // ✅ your actual deployed frontend URL (NOT nexus-frontend.vercel.app)
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -18,6 +18,7 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  console.log(`🚀 Backend running on http://localhost:${port}`);
+  console.log(`🚀 Backend running on port ${port}`);
 }
+
 bootstrap();
