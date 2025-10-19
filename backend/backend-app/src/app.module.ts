@@ -20,7 +20,7 @@ import { User } from './users/user.entity';
         type: 'postgres',
         url: process.env.DATABASE_URL,
         autoLoadEntities: true,
-        synchronize: process.env.NODE_ENV !== 'production',
+        synchronize: true, // ✅ TEMP: auto-create tables for first deploy
         logging: ['error', 'warn'],
         ssl:
           process.env.NODE_ENV === 'production'
