@@ -4,12 +4,13 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // ✅ Safe and flexible CORS configuration
+  // ✅ Updated CORS Configuration
   app.enableCors({
     origin: [
-      'http://localhost:5173', // for local Vite dev
-      'http://localhost:5174', // optional local
-      'https://nexus-m766.vercel.app', // ✅ your actual deployed frontend URL (NOT nexus-frontend.vercel.app)
+      'http://localhost:5173', // local Vite dev
+      'http://localhost:5174',
+      'https://nexus-frontend.vercel.app', // old (if used)
+      'https://nexus-m766.vercel.app', // ✅ your actual live frontend domain
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

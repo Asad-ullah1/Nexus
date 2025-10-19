@@ -1,9 +1,9 @@
-import { Controller, Post, Body, Request } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
   async signup(
@@ -17,7 +17,7 @@ export class AuthController {
       );
     } catch (error) {
       console.error('Signup controller error:', error);
-      throw error;
+      throw new BadRequestException('Signup failed. Please try again.');
     }
   }
 
@@ -28,13 +28,15 @@ export class AuthController {
         loginDto.email,
         loginDto.password,
       );
+
       if (!user) {
-        throw new Error('Invalid credentials');
+        throw new BadRequestException('Invalid credentials');
       }
+
       return this.authService.login(user);
     } catch (error) {
       console.error('Login controller error:', error);
-      throw error;
+      throw new BadRequestException('Login failed. Please try again.');
     }
   }
 }

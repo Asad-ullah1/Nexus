@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
@@ -9,20 +9,27 @@ import { User } from './users/user.entity';
 
 @Module({
   imports: [
+    // ✅ Global .env configuration
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    // ✅ Database connection setup
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: process.env.DATABASE_URL, // Reads from .env
-      autoLoadEntities: true, // Auto-detects all entities in project
-      synchronize: process.env.NODE_ENV !== 'production', // Auto-sync only in development
-      logging: ['error', 'warn'], // Logs errors/warnings
-      ssl: { rejectUnauthorized: false }, // Enable SSL for production (Render PostgreSQL)
-      retryAttempts: 3, // Retries if DB not ready
-      retryDelay: 3000, // Wait time between retries
+
+    // ✅ Database connection
+    TypeOrmModule.forRootAsync({
+      useFactory: () => ({
+        type: 'postgres',
+        url: process.env.DATABASE_URL,
+        autoLoadEntities: true,
+        synchronize: process.env.NODE_ENV !== 'production',
+        logging: ['error', 'warn'],
+        ssl:
+          process.env.NODE_ENV === 'production'
+            ? { rejectUnauthorized: false }
+            : false, // Disable SSL locally
+      }),
     }),
+
+    // ✅ Load entities and modules
     TypeOrmModule.forFeature([User]),
     AuthModule,
     UsersModule,
@@ -32,7 +39,7 @@ import { User } from './users/user.entity';
 })
 export class AppModule {
   constructor() {
-    console.log('🔍 LOCAL DATABASE CONNECTION DEBUG:');
+    console.log('🟢 AppModule initialized');
     console.log('DATABASE_URL:', process.env.DATABASE_URL);
   }
 }
