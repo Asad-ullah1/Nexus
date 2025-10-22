@@ -22,7 +22,7 @@
 ## 📸 Screenshots
 | Signup | Dashboard | Insights |
 |--------|------------|-----------|
-| ![Signup](signup.png) | ![Dashboard](dashboard.png) | ![Insghts](insght.png) | [Insghts](create insghts.png)
+| ![Signup](signup.png) | ![Dashboard](dashboard.png) | ![Insights](insghts.png) | [Insghts](create insghts.png)
 
 ---
 **Frontend**
