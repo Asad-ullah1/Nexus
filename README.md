@@ -12,7 +12,19 @@
 ---
 
 ## 🧩 Tech Stack
+---
 
+## 🎥 Demo Video
+[Watch the Live Demo]([https://youtu.be/your-video-link](https://drive.google.com/file/d/1gF1OaP5B77fmRLKhLerXKIfB2K-3zqM-/view?usp=drive_link)
+
+---
+
+## 📸 Screenshots
+| Signup | Dashboard | Insights |
+|--------|------------|-----------|
+| ![Signup](screenshots/signup.png) | ![Dashboard](screenshots/dashboard.png) | ![Insights](screenshots/insight.png) |
+
+---
 **Frontend**
 - React (Vite) ⚡  
 - Bootstrap / Custom CSS 🎨  
